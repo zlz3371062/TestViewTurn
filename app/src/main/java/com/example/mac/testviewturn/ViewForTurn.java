@@ -7,10 +7,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+/**
+ * @author : zlz
+ * @time : 2016/7/22
+ * @version : 1.2
+ * @Description : android 自定义仪表盘控件
+ */
 public class ViewForTurn extends View {
 
 	private Context context;
@@ -23,7 +30,10 @@ public class ViewForTurn extends View {
 	private int padingwidth;// 圆环距离边缘的距离，距离越大圆环越小
 	private float fTurn = -120;
 	private Bitmap bit;
-	private float zlz;
+	private int intZlzValue;
+	private float flZlzvalue;
+	private boolean turn = false;
+	private int intSpeed = 20;
 
 	public ViewForTurn(Context context) {
 		super(context);
@@ -59,8 +69,8 @@ public class ViewForTurn extends View {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		// TODO Auto-generated method stub
-		height = View.MeasureSpec.getSize(heightMeasureSpec);
-		width = View.MeasureSpec.getSize(widthMeasureSpec);
+		height = MeasureSpec.getSize(heightMeasureSpec);
+		width = MeasureSpec.getSize(widthMeasureSpec);
 		if (width >= height) {
 			circleWidth = height;
 		} else {
@@ -73,7 +83,7 @@ public class ViewForTurn extends View {
 		oval.right = circleWidth - padingwidth; // 右边
 		oval.bottom = circleWidth - padingwidth; // 下边
 		// 自动旋转
-		// handler.postDelayed(runnable, 500);
+		handler.postDelayed(runnable, 100);
 	}
 
 	@Override
@@ -132,18 +142,16 @@ public class ViewForTurn extends View {
 		// 画指针中心
 		bit = BitmapFactory.decodeResource(getResources(), R.drawable.bz);
 		canvas.drawCircle(circleWidth / 2, circleWidth / 2, px2dip(context, 25), _txtPaint);
-		// if (turn){
+
 		canvas.rotate(fTurn, circleWidth / 2, circleWidth / 2);
 		canvas.drawBitmap(bit, circleWidth / 2 - px2dip(context, 7), circleWidth / 2 - px2dip(context, 90), _txtPaint);
 		canvas.rotate(-fTurn, circleWidth / 2, circleWidth / 2);
-
-		// }
 
 		// 画文字方框
 		_txtPaint.setColor(Color.GRAY);
 		canvas.drawRect(circleWidth / 2 - px2dip(context, 45), circleWidth / 2 + px2dip(context, 40),
 				circleWidth / 2 + px2dip(context, 45), circleWidth / 2 + px2dip(context, 60), _txtPaint);
-		String zlztxt = "当前值：" + (int) (zlz);
+		String zlztxt = "当前值：" + intZlzValue;
 		_txtPaint.setColor(Color.BLACK);
 		_txtPaint.setTextSize(30);
 		canvas.drawText(zlztxt, circleWidth / 2 - px2dip(context, 40), circleWidth / 2 + px2dip(context, 55),
@@ -157,30 +165,58 @@ public class ViewForTurn extends View {
 		return (int) (pxValue * scale + 0.5f);
 	}
 
-	// Handler handler = new Handler();
-	// Runnable runnable = new Runnable() {
-	//
-	// @Override
-	// public void run() {
-	// // TODO Auto-generated method stub
-	// invalidate();
-	// handler.postDelayed(runnable, 100);
-	// currentDegree = currentDegree + 8;
-	// if (currentDegree > zlz) {
-	// turn = true;
-	// handler.removeCallbacks(runnable);
-	// }
-	//
-	// }
-	// };
-	//
+	Handler handler = new Handler();
+	Runnable runnable = new Runnable() {
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			turn = true;
+			invalidate();
+			handler.postDelayed(runnable, 1);
+
+			if (flZlzvalue - fTurn < intSpeed) {
+				fTurn = fTurn + 1;
+				if (fTurn > flZlzvalue) {
+					turn = false;
+					handler.removeCallbacks(runnable);
+				}
+			} else {
+
+				fTurn = fTurn + intSpeed;
+
+			}
+		}
+	};
+
+	/**
+	 * @Description:设置指针初次指向的值
+	 * @Parameters:整数类型0到100的闭区间
+	 */
 	public void setValue(int pzlz) {
+		intZlzValue = pzlz;
+		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
+		Log.e("zlz", flZlzvalue + "");
 
-		zlz = (float) pzlz;
-		fTurn = zlz / 100f * 240 - 120;
-		Log.e("zlz", fTurn + "");
+	}
+
+	/**
+	 * @Description:临时改变指针指向的值
+	 * @Parameters:整数类型0到100的闭区间
+	 */
+	public void changeValue(int pzlz) {
+		intZlzValue = pzlz;
+		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
+		handler.postDelayed(runnable, 100);
 		invalidate();
+	}
 
+	/**
+	 * @Description:设置指针转动的速度一般是越靠近指针指向的值(不大于指针指向的值) 指针转向越快
+	 * @Parameters:是一个正整数只要设置的速度大于指针指向的值那个设置的速度就无效
+	 */
+	public void setTurnSpeed(int pspeed) {
+		intSpeed = pspeed;
 	}
 
 }
