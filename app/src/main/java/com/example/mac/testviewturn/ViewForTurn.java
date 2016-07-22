@@ -146,6 +146,10 @@ public class ViewForTurn extends View {
 		canvas.rotate(fTurn, circleWidth / 2, circleWidth / 2);
 		canvas.drawBitmap(bit, circleWidth / 2 - px2dip(context, 7), circleWidth / 2 - px2dip(context, 90), _txtPaint);
 		canvas.rotate(-fTurn, circleWidth / 2, circleWidth / 2);
+		if (!turn) {
+			fTurn = -120;
+
+		}
 
 		// 画文字方框
 		_txtPaint.setColor(Color.GRAY);
