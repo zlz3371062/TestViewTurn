@@ -34,7 +34,7 @@ public class ViewForTurn extends View {
 	private int intZlzValue; // 用户设定值
 	private float flZlzvalue ; // 用户设定值转为角度
 	private boolean turn = false;
-	private int intSpeed = 20;
+	private int intSpeed = 1;
 	private TypedArray tyStyle; // 属性管理
 	private int fColor, sColor, tColor;
 
@@ -137,11 +137,18 @@ public class ViewForTurn extends View {
 		// 文字结束
 
 		// 画指针中心
-		bit = BitmapFactory.decodeResource(getResources(), R.drawable.bz);
+
 		canvas.drawCircle(circleWidth / 2, circleWidth / 2, px2dip(context, 25), _txtPaint);
+
+
+		bit = BitmapFactory.decodeResource(getResources(), R.drawable.bz);
 		canvas.rotate(fTurn, circleWidth / 2, circleWidth / 2);
 		Log.e("zlz", fTurn + "指针坐标轴旋转角度");
-		canvas.drawBitmap(bit, circleWidth / 2 - px2dip(context, 7), circleWidth / 2 - px2dip(context, 90), _txtPaint);
+//		canvas.drawBitmap(bit, circleWidth / 2 - px2dip(context, 7), circleWidth / 2 - px2dip(context, 90), _txtPaint);
+		_txtPaint.setStrokeWidth(px2dip(context, 5));
+		_txtPaint.setStrokeCap(Paint.Cap.ROUND);
+		canvas.drawLine(circleWidth / 2,padingwidth + strokeWidth / 2 +  px2dip(context, 25) , circleWidth / 2 , circleWidth / 2 , _txtPaint);
+
 		canvas.rotate(-fTurn, circleWidth / 2, circleWidth / 2);
 		if (!turn) {
 			fTurn = -120;
@@ -205,7 +212,7 @@ public class ViewForTurn extends View {
 			turn = true;
 			Log.e("zlz", fTurn + "fTurn");
 			invalidate();
-			handler.postDelayed(runnable, 5);
+			handler.postDelayed(runnable, 10);
 			if (flZlzvalue - fTurn < intSpeed) {
 				fTurn = fTurn + 1;
 				if (fTurn > flZlzvalue) {
