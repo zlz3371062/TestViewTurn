@@ -30,10 +30,10 @@ public class ViewForTurn extends View {
 	private int padingwidth;// 圆环距离边缘的距离，距离越大圆环越小
 	private float fTurn = -120;
 	private Bitmap bit;
-	private int intZlzValue;
-	private float flZlzvalue;
+	private int intZlzValue = 100;
+	private float flZlzvalue = 120;
 	private boolean turn = false;
-	private int intSpeed = 20;
+	private int intSpeed = 1;
 
 	public ViewForTurn(Context context) {
 		super(context);
@@ -69,8 +69,8 @@ public class ViewForTurn extends View {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		// TODO Auto-generated method stub
-		height = MeasureSpec.getSize(heightMeasureSpec);
-		width = MeasureSpec.getSize(widthMeasureSpec);
+		height = View.MeasureSpec.getSize(heightMeasureSpec);
+		width = View.MeasureSpec.getSize(widthMeasureSpec);
 		if (width >= height) {
 			circleWidth = height;
 		} else {
@@ -83,7 +83,7 @@ public class ViewForTurn extends View {
 		oval.right = circleWidth - padingwidth; // 右边
 		oval.bottom = circleWidth - padingwidth; // 下边
 		// 自动旋转
-		handler.postDelayed(runnable, 100);
+		handler.postDelayed(runnable, 500);
 	}
 
 	@Override
@@ -142,13 +142,12 @@ public class ViewForTurn extends View {
 		// 画指针中心
 		bit = BitmapFactory.decodeResource(getResources(), R.drawable.bz);
 		canvas.drawCircle(circleWidth / 2, circleWidth / 2, px2dip(context, 25), _txtPaint);
-
 		canvas.rotate(fTurn, circleWidth / 2, circleWidth / 2);
+		Log.e("zlz", fTurn + "指针坐标轴旋转角度");
 		canvas.drawBitmap(bit, circleWidth / 2 - px2dip(context, 7), circleWidth / 2 - px2dip(context, 90), _txtPaint);
 		canvas.rotate(-fTurn, circleWidth / 2, circleWidth / 2);
 		if (!turn) {
 			fTurn = -120;
-
 		}
 
 		// 画文字方框
@@ -169,6 +168,38 @@ public class ViewForTurn extends View {
 		return (int) (pxValue * scale + 0.5f);
 	}
 
+	/**
+	 * @Description:设置指针初次指向的值
+	 * @Parameters:整数类型0到100的闭区间
+	 */
+	public void setValue(int pzlz) {
+		intZlzValue = pzlz;
+		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
+		Log.e("zlz", flZlzvalue + "");
+		handler.postDelayed(runnable, 500);
+		invalidate();
+
+	}
+
+	/**
+	 * @Description:临时改变指针指向的值
+	 * @Parameters:整数类型0到100的闭区间
+	 */
+	public void changeValue(int pzlz) {
+		intZlzValue = pzlz;
+		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
+		handler.postDelayed(runnable, 500);
+		invalidate();
+	}
+
+	/**
+	 * @Description:设置指针转动的速度一般是越靠近指针指向的值(不大于指针指向的值) 指针转向越快
+	 * @Parameters:是一个正整数只要设置的速度大于指针指向的值那个设置的速度就无效
+	 */
+	public void setTurnSpeed(int pspeed) {
+		intSpeed = pspeed;
+	}
+
 	Handler handler = new Handler();
 	Runnable runnable = new Runnable() {
 
@@ -176,8 +207,9 @@ public class ViewForTurn extends View {
 		public void run() {
 			// TODO Auto-generated method stub
 			turn = true;
+			Log.e("zlz", fTurn + "fTurn");
 			invalidate();
-			handler.postDelayed(runnable, 1);
+			handler.postDelayed(runnable, 5);
 
 			if (flZlzvalue - fTurn < intSpeed) {
 				fTurn = fTurn + 1;
@@ -192,35 +224,5 @@ public class ViewForTurn extends View {
 			}
 		}
 	};
-
-	/**
-	 * @Description:设置指针初次指向的值
-	 * @Parameters:整数类型0到100的闭区间
-	 */
-	public void setValue(int pzlz) {
-		intZlzValue = pzlz;
-		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
-		Log.e("zlz", flZlzvalue + "");
-
-	}
-
-	/**
-	 * @Description:临时改变指针指向的值
-	 * @Parameters:整数类型0到100的闭区间
-	 */
-	public void changeValue(int pzlz) {
-		intZlzValue = pzlz;
-		flZlzvalue = ((float) pzlz / 100f) * 240 - 120;
-		handler.postDelayed(runnable, 100);
-		invalidate();
-	}
-
-	/**
-	 * @Description:设置指针转动的速度一般是越靠近指针指向的值(不大于指针指向的值) 指针转向越快
-	 * @Parameters:是一个正整数只要设置的速度大于指针指向的值那个设置的速度就无效
-	 */
-	public void setTurnSpeed(int pspeed) {
-		intSpeed = pspeed;
-	}
 
 }
