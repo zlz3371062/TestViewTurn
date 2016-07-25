@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ViewForTurn">
+        <attr name = "fColor" format="color"/>
+        <attr name = "sColor" format="color"/>
+        <attr name = "tColor" format="color"/>
+        <attr name = "initValue" format="integer"/>
+    </declare-styleable>
+
+
+</resources>

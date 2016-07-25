@@ -16,8 +16,13 @@
         android:layout_height="wrap_content"
         android:text="Hello World!" />
     <com.example.mac.testviewturn.ViewForTurn
+        xmlns:turn="http://schemas.android.com/apk/res/com.example.mac.testviewturn"
         android:id="@+id/zlz"
          android:layout_width="match_parent"
         android:layout_height="match_parent"
+        turn:fColor = "#000000"
+        turn:sColor = "#00ff00"
+        turn:tColor = "#ff0000"
+        turn:initValue = "50"
         />
 </LinearLayout>

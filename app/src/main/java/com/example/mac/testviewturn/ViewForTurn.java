@@ -1,6 +1,7 @@
 package com.example.mac.testviewturn;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -28,33 +29,36 @@ public class ViewForTurn extends View {
 	private int circleWidth;//
 	private int strokeWidth;// 画笔大小，可以控制圆环的宽度，可以看作小长方形的�?
 	private int padingwidth;// 圆环距离边缘的距离，距离越大圆环越小
-	private float fTurn = -120;
+	private float fTurn; // 记录指针旋转角度
 	private Bitmap bit;
-	private int intZlzValue = 100;
-	private float flZlzvalue = 120;
+	private int intZlzValue; // 用户设定值
+	private float flZlzvalue ; // 用户设定值转为角度
 	private boolean turn = false;
-	private int intSpeed = 1;
+	private int intSpeed = 20;
+	private TypedArray tyStyle; // 属性管理
+	private int fColor, sColor, tColor;
 
 	public ViewForTurn(Context context) {
-		super(context);
-		this.context = context;
-		init();
+		this(context, null);
 	}
 
 	public ViewForTurn(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		this.context = context;
-		init();
+		this(context, attrs, 0);
 	}
 
 	public ViewForTurn(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		this.context = context;
+		tyStyle = context.obtainStyledAttributes(attrs, R.styleable.ViewForTurn);
+		fColor = tyStyle.getColor(R.styleable.ViewForTurn_fColor, 0XFF00ffff);
+		sColor = tyStyle.getColor(R.styleable.ViewForTurn_sColor, 0XFFff00ff);
+		tColor = tyStyle.getColor(R.styleable.ViewForTurn_tColor, 0XFFffff00);
+		intZlzValue = tyStyle.getInteger(R.styleable.ViewForTurn_initValue, 0);
+		fTurn = ((float) intZlzValue / 100f) * 240 - 120;
 		init();
 	}
 
 	private void init() {
-
 		padingwidth = px2dip(context, 30f);// 圆环距离边缘的距离，距离越大圆环越小
 		strokeWidth = px2dip(context, 30f);// 画
 		paint = new Paint();
@@ -63,11 +67,11 @@ public class ViewForTurn extends View {
 		oval = new RectF();
 		paint.setStrokeWidth(strokeWidth); // 线宽
 		paint.setStyle(Paint.Style.STROKE);
-
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		Log.e("zlz", "onMeasure");
 		// TODO Auto-generated method stub
 		height = View.MeasureSpec.getSize(heightMeasureSpec);
 		width = View.MeasureSpec.getSize(widthMeasureSpec);
@@ -82,33 +86,26 @@ public class ViewForTurn extends View {
 		oval.top = padingwidth; // 上边
 		oval.right = circleWidth - padingwidth; // 右边
 		oval.bottom = circleWidth - padingwidth; // 下边
-		// 自动旋转
-		handler.postDelayed(runnable, 500);
+
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// 画弧
-		paint.setColor(Color.GREEN);
+		paint.setColor(fColor);
 		canvas.drawArc(oval, 148, 1f, false, paint);
 		for (int i = 0; i < 240; i++) {
 			if (i % 24 == 0) {
 				int _intPer = i / 24;
 				if (_intPer < 6) {
-
-					paint.setColor(Color.GREEN);
-
+					paint.setColor(fColor);
 				} else if (_intPer > 5 && _intPer < 8) {
-					paint.setColor(Color.MAGENTA);
-
+					paint.setColor(sColor);
 				} else {
-
-					paint.setColor(Color.WHITE);
+					paint.setColor(tColor);
 					canvas.drawArc(oval, 30, 1f, false, paint);
-
 				}
 				canvas.drawArc(oval, 150 + i, 23f, false, paint);
-
 			}
 
 		}
@@ -159,7 +156,6 @@ public class ViewForTurn extends View {
 		_txtPaint.setTextSize(30);
 		canvas.drawText(zlztxt, circleWidth / 2 - px2dip(context, 40), circleWidth / 2 + px2dip(context, 55),
 				_txtPaint);
-
 	}
 
 	public static int px2dip(Context context, float pxValue) {
@@ -210,7 +206,6 @@ public class ViewForTurn extends View {
 			Log.e("zlz", fTurn + "fTurn");
 			invalidate();
 			handler.postDelayed(runnable, 5);
-
 			if (flZlzvalue - fTurn < intSpeed) {
 				fTurn = fTurn + 1;
 				if (fTurn > flZlzvalue) {
@@ -218,9 +213,7 @@ public class ViewForTurn extends View {
 					handler.removeCallbacks(runnable);
 				}
 			} else {
-
 				fTurn = fTurn + intSpeed;
-
 			}
 		}
 	};
